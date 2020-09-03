@@ -5,10 +5,30 @@ import { Card } from "react-native-paper";
 export class Home extends Component {
   render() {
     const data = [
-      { id: 1, name: "mukesh", position: "web dev" },
-      { id: 2, name: "suresh", position: "android dev" },
-      { id: 3, name: "ramesh", position: "ML expert" },
-      { id: 4, name: "hitesh", position: "web dev" },
+      {
+        id: 1,
+        name: "mukesh",
+        position: "web dev",
+        pic: "https://i.ytimg.com/vi/f6eXSnajYOA/maxresdefault.jpg",
+      },
+      {
+        id: 2,
+        name: "suresh",
+        position: "android dev",
+        pic: "https://www.holidify.com/images/bgImages/PAHALGAM.jpg",
+      },
+      {
+        id: 3,
+        name: "ramesh",
+        position: "ML expert",
+        pic: "https://www.nationalparks.nsw.gov.au/-/media/npws/images/parks/blue-mountains-national-park/blackheath-area/pulpit-rock-track/pulpit-walking-track-01.jpg",
+      },
+      {
+        id: 4,
+        name: "hitesh",
+        position: "web dev",
+        pic: "https://tse4.mm.bing.net/th?id=OIP.HSwUQfniV1zAJo07eMF03wHaC4&pid=Api&P=0&w=397&h=155",
+      },
     ];
 
     const renderList = data.map((item) => {
@@ -18,7 +38,7 @@ export class Home extends Component {
             <Image
               style={{ width: 60, height: 60, borderRadius: 30 }}
               source={{
-                uri: "https://www.holidify.com/images/bgImages/PAHALGAM.jpg",
+                uri: item.pic,
               }}
             />
             <View style={{ marginLeft: 10 }}>
