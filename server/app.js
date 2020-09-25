@@ -48,7 +48,7 @@ app.post("/send-data", (req, res) => {
       res.send(data);
     })
     .catch((err) => {
-      console.log(error);
+      console.log(err);
     });
 });
 
@@ -76,7 +76,7 @@ app.post("/update", (req, res) => {
       res.send(data);
     })
     .catch((err) => {
-      console.log(error);
+      console.log(err);
     });
 });
 app.listen(3000, () => {

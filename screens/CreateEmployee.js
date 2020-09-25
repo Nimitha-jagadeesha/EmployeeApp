@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Modal } from "react-native";
+import { View, Text, StyleSheet, Modal, Alert } from "react-native";
 import { TextInput, Button } from "react-native-paper";
+import * as ImagePicker from "expo-image-picker";
+import Constants from "expo-constants";
+import * as Permissions from "expo-permissions";
 
 const CreateEmployee = () => {
   const [Name, setName] = useState("");
@@ -9,6 +12,68 @@ const CreateEmployee = () => {
   const [salary, setSalary] = useState("");
   const [pic, setPicture] = useState("");
   const [modal, setModal] = useState(false);
+
+  const picFromGallary = async () => {
+    const { granted } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+    if (granted) {
+      let data = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+      if (!data.cancelled) {
+        let newFile = {
+          uri: data.uri,
+          type: `test/${data.uri.split(".")[1]}`,
+          name: `test/${data.uri.split(".")[1]}`,
+        };
+        handleUpload(newFile);
+        setModal(false)
+      }
+    } else {
+      Alert.alert("You need to give us permission to work");
+    }
+  };
+
+  const picFromCamera = async () => {
+    const { granted } = await Permissions.askAsync(Permissions.CAMERA);
+    if (granted) {
+      let data = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+      if (!data.cancelled) {
+        let newFile = {
+          uri: data.uri,
+          type: `test/${data.uri.split(".")[1]}`,
+          name: `test/${data.uri.split(".")[1]}`,
+        };
+        handleUpload(newFile);
+        setModal(false)
+      }
+    } else {
+      Alert.alert("You need to give us permission to work");
+    }
+  };
+
+  const handleUpload = (image) => {
+    const data = new FormData();
+    data.append("file", image);
+    data.append("upload_preset", "EmployeeApp");
+    data.append("cloud_name", "nimitha");
+    fetch("https://api.cloudinary.com/v1_1/nimitha/image/upload", {
+      method: "post",
+      body: data,
+    }).then((res) => res.json())
+    .then((data) => {
+      console.log(data);
+      setPicture(data.url)
+    });
+  };
+
   return (
     <View style={styles.root}>
       <TextInput
@@ -45,7 +110,7 @@ const CreateEmployee = () => {
         onChangeText={(text) => setSalary(text)}
       ></TextInput>
       <Button
-        icon="upload"
+        icon={pic==""?'upload':'check'}
         mode="contained"
         style={styles.inputStyle}
         theme={theme}
@@ -54,14 +119,14 @@ const CreateEmployee = () => {
         Upload Image
       </Button>
       <Button
-      icon="content-save"
-      mode="contained"
-      style={styles.inputStyle}
-      theme={theme}
-      onPress={() =>console.log("saved")}
-    >
-      Save
-    </Button>
+        icon="content-save"
+        mode="contained"
+        style={styles.inputStyle}
+        theme={theme}
+        onPress={() => console.log("saved")}
+      >
+        Save
+      </Button>
       <Modal
         animationType="slide"
         transparent={true}
@@ -74,7 +139,7 @@ const CreateEmployee = () => {
               icon="camera"
               mode="contained"
               theme={theme}
-              onPress={() => setModal(false)}
+              onPress={() => picFromCamera()}
             >
               Camera
             </Button>
@@ -82,16 +147,12 @@ const CreateEmployee = () => {
               icon="image-area"
               mode="contained"
               theme={theme}
-              onPress={() => setModal(false)}
+              onPress={() => picFromGallary()}
             >
               Gallary
             </Button>
           </View>
-          <Button
-            mode="text"
-            theme={theme}
-            onPress={() => setModal(false)}
-          >
+          <Button mode="text" theme={theme} onPress={() => setModal(false)}>
             Cancel
           </Button>
         </View>
