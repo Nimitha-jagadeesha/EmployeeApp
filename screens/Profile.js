@@ -1,5 +1,13 @@
 import React from "react";
-import { View, Text, StyleSheet, Image, Linking, Platform } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  Linking,
+  Platform,
+  Alert,
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Title, Card, Button } from "react-native-paper";
 import { MaterialIcons, Entypo } from "@expo/vector-icons";
@@ -11,7 +19,45 @@ const openDial = (phone) => {
   }
 };
 const Profile = (props) => {
-  const { pic, name, position, email, phone, salary } = props.route.params.item;
+  const {
+    pic,
+    name,
+    position,
+    email,
+    phone,
+    salary,
+    _id,
+  } = props.route.params.item;
+  const { navigation } = props;
+  const deleteEmployee = () => {
+    fetch("https://employeeapp.glitch.me/delete", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: _id,
+      }),
+    })
+      .then((res) => res.json)
+      .then((data) => {
+        Alert.alert(`Deleted sucessfully`);
+        navigation.navigate("Home");
+      });
+  };
+
+  const editEmployee = () => {
+    navigation.navigate("create", {
+      pic,
+      name,
+      position,
+      email,
+      phone,
+      salary,
+      _id,
+    });
+  };
+
   return (
     <View style={styles.root}>
       <LinearGradient
@@ -65,10 +111,20 @@ const Profile = (props) => {
           padding: 10,
         }}
       >
-        <Button icon="account-edit" mode="contained" theme={theme}>
+        <Button
+          icon="account-edit"
+          mode="contained"
+          theme={theme}
+          onPress={() => editEmployee()}
+        >
           Edit
         </Button>
-        <Button icon="delete" mode="contained" theme={theme}>
+        <Button
+          icon="delete"
+          mode="contained"
+          theme={theme}
+          onPress={() => deleteEmployee()}
+        >
           Fire Employee
         </Button>
       </View>

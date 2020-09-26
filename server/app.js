@@ -36,7 +36,7 @@ app.post("/send-data", (req, res) => {
   const employee = new Employee({
     name: req.body.name,
     email: req.body.email,
-    picture: req.body.pic,
+    pic: req.body.pic,
     salary: req.body.salary,
     position: req.body.position,
     phone: req.body.phone,

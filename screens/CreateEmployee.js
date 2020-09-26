@@ -2,16 +2,64 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Modal, Alert } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
-import Constants from "expo-constants";
 import * as Permissions from "expo-permissions";
 
-const CreateEmployee = () => {
-  const [Name, setName] = useState("");
-  const [phone, setPhone] = useState("");
-  const [email, setEmail] = useState("");
-  const [salary, setSalary] = useState("");
-  const [pic, setPicture] = useState("");
+const CreateEmployee = (props) => {
+  const { navigation } = props;
+  const { params } = props.route;
+  console.log(props);
+  const [name, setName] = useState(params ? params.name : "");
+  const [phone, setPhone] = useState(params ? params.phone : "");
+  const [email, setEmail] = useState(params ? params.email : "");
+  const [salary, setSalary] = useState(params ? params.salary : "");
   const [modal, setModal] = useState(false);
+  const [pic, setPicture] = useState(params ? params.pic : "");
+  const [position, setPosition] = useState(params ? params.position : "");
+
+  const submitData = () => {
+    if (!params) {
+      fetch("https://employeeapp.glitch.me/send-data", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          pic,
+          phone,
+          salary,
+          email,
+          position,
+        }),
+      })
+        .then((res) => res.json)
+        .then((data) => {
+          Alert.alert(`saved sucessfully`);
+          navigation.navigate("Home");
+        });
+    } else {
+      fetch("https://employeeapp.glitch.me/update", {
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id: params._id,
+          name,
+          pic,
+          phone,
+          salary,
+          email,
+          position,
+        }),
+      })
+        .then((res) => res.json)
+        .then((data) => {
+          Alert.alert(`Updated sucessfully`);
+          navigation.navigate("Home");
+        });
+    }
+  };
 
   const picFromGallary = async () => {
     const { granted } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
@@ -29,7 +77,7 @@ const CreateEmployee = () => {
           name: `test/${data.uri.split(".")[1]}`,
         };
         handleUpload(newFile);
-        setModal(false)
+        setModal(false);
       }
     } else {
       Alert.alert("You need to give us permission to work");
@@ -52,7 +100,7 @@ const CreateEmployee = () => {
           name: `test/${data.uri.split(".")[1]}`,
         };
         handleUpload(newFile);
-        setModal(false)
+        setModal(false);
       }
     } else {
       Alert.alert("You need to give us permission to work");
@@ -67,18 +115,22 @@ const CreateEmployee = () => {
     fetch("https://api.cloudinary.com/v1_1/nimitha/image/upload", {
       method: "post",
       body: data,
-    }).then((res) => res.json())
-    .then((data) => {
-      console.log(data);
-      setPicture(data.url)
-    });
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        setPicture(data.url);
+      })
+      .catch((err) => {
+        Alert.alert("Something went wrong!");
+      });
   };
 
   return (
     <View style={styles.root}>
       <TextInput
         label="Name"
-        value={Name}
+        value={name}
         style={styles.inputStyle}
         theme={theme}
         mode="outlined"
@@ -109,8 +161,16 @@ const CreateEmployee = () => {
         mode="outlined"
         onChangeText={(text) => setSalary(text)}
       ></TextInput>
+      <TextInput
+        label="Position"
+        value={position}
+        style={styles.inputStyle}
+        theme={theme}
+        mode="outlined"
+        onChangeText={(text) => setPosition(text)}
+      ></TextInput>
       <Button
-        icon={pic==""?'upload':'check'}
+        icon={pic == "" ? "upload" : "check"}
         mode="contained"
         style={styles.inputStyle}
         theme={theme}
@@ -123,10 +183,11 @@ const CreateEmployee = () => {
         mode="contained"
         style={styles.inputStyle}
         theme={theme}
-        onPress={() => console.log("saved")}
+        onPress={() => submitData()}
       >
         Save
       </Button>
+
       <Modal
         animationType="slide"
         transparent={true}

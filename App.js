@@ -25,9 +25,10 @@ function App() {
           component={CreateEmployee}
           options={{ ...myOptions, title: "Create Employee" }}
         />
-        <Stack.Screen name="Profile" 
-        component={Profile} 
-        options={{ ...myOptions, title: "Profile" }}
+        <Stack.Screen
+          name="Profile"
+          component={Profile}
+          options={{ ...myOptions, title: "Profile" }}
         />
       </Stack.Navigator>
     </View>
